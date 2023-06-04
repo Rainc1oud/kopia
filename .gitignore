@@ -30,3 +30,5 @@ coverage.txt
 .screenshots/
 .idea/
 /.vs
+
+.direnv/
