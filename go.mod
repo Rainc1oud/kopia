@@ -2,6 +2,11 @@ module github.com/kopia/kopia
 
 go 1.20
 
+replace( 
+		github.com/kopia/kopia/ => ./
+		github.com/kopia/kopia/repo/blob/uplink => ./kopia/repo/blob/uplink
+	)
+
 require (
 	cloud.google.com/go/storage v1.30.1
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.6.1

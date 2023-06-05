@@ -22,6 +22,7 @@ import (
 	"github.com/kopia/kopia/repo/blob"
 	"github.com/kopia/kopia/repo/blob/filesystem"
 	"github.com/kopia/kopia/repo/blob/s3"
+	"github.com/kopia/kopia/repo/blob/uplink"
 	"github.com/kopia/kopia/snapshot"
 	"github.com/kopia/kopia/snapshot/policy"
 	"github.com/kopia/kopia/snapshot/snapshotfs"
@@ -191,6 +192,11 @@ func (kc *KopiaClient) getStorage(ctx context.Context, repoDir, bucketName strin
 			AccessKeyID:     os.Getenv(awsAccessKeyIDEnvKey),
 			SecretAccessKey: os.Getenv(awsSecretAccessKeyEnvKey),
 		}
+
+		uOptions := &uplink.Options{}
+
+		uplink.New(ctx, uOptions, false)
+
 		st, err = s3.New(ctx, s3Opts, false)
 	} else {
 		if iErr := os.MkdirAll(repoDir, 0o700); iErr != nil {
