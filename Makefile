@@ -197,14 +197,17 @@ endif
 
 # alternative (container) build because very old glibc arm systems apparently don't support the binary otherwise
 dist/kopia_linux_armv7l/kopia: $(all_go_sources)
-	podman run -i \
+	if [ -z "${CI}" ]; then podman run -i \
 		-v $(CURDIR):$(CURDIR) \
 		-w $(CURDIR) \
 		-e GONOSUMDB="$(shell go env GONOSUMDB)" \
 		-e GOPROXY="$(shell go env GOPROXY)" \
 		-e GOOS=linux -e GOARCH=arm \
 		1nnoserv:15000/xbuildimg/rcbuild-go:arm-glibc2.17-go1.20.1 \
-		go build $(KOPIA_BUILD_FLAGS) -o $@ -tags "$(KOPIA_BUILD_TAGS)"
+		go build $(KOPIA_BUILD_FLAGS) -o $@ -tags "$(KOPIA_BUILD_TAGS)"; \
+	else \
+		go build $(KOPIA_BUILD_FLAGS) -o $@ -tags "$(KOPIA_BUILD_TAGS)"; \
+	fi
 
 # builds kopia CLI binary that will be later used as a server for kopia-ui.
 kopia: $(kopia_ui_embedded_exe)
