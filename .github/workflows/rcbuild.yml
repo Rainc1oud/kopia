@@ -1,0 +1,25 @@
+name: Build Kopia rcbuild artefacts
+on:
+  push:
+    branches:
+      - rcbuild
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/ppenguin/xbuildimg/rcbuild-go:arm-glibc2.17-go1.20.1
+      env:
+        GOOS: linux
+        GOARCH: arm
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Build arm32v7 binary with make
+        run: make dist/kopia_linux_armv7l/kopia
+      - name: Store build artefacts (binary)
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-binary
+          path: |
+            dist/kopia_linux_armv7l/kopia
