@@ -51,6 +51,10 @@ endif
 
 -include ./Makefile.local.mk
 
+.PHONY: clean
+clean:
+	go clean
+
 install:
 	go install $(KOPIA_BUILD_FLAGS) -tags "$(KOPIA_BUILD_TAGS)" github.com/kopia/kopia
 
