@@ -18,6 +18,7 @@ jobs:
         run: |
           docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
           docker run --rm \
+            --platform=linux/arm32v7 \
             -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static \
             -v $(pwd):$(pwd) \
             -w $(pwd) \
