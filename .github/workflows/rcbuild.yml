@@ -16,7 +16,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
       - name: Build arm32v7 binary with make
-        uses: actions/run-on-arch-action@v2
+        uses: uraimo/run-on-arch-action@v2
         with:
           arch: armv7
           run: make dist/kopia_linux_armv7l/kopia
