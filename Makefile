@@ -196,6 +196,7 @@ else
 endif
 
 # alternative (container) build because very old glibc arm systems apparently don't support the binary otherwise
+# note that under qemu notably the dependency appengine takes *very long* to build. (Probably only needed for repo backend gcs?)
 dist/kopia_linux_armv7l/kopia: $(all_go_sources)
 	if [ -z "${CI}" ]; then podman run -i \
 		-v $(CURDIR):$(CURDIR) \
