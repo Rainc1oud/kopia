@@ -19,7 +19,7 @@ jobs:
         uses: actions/run-on-arch-action@v2
         with:
           arch: armv7
-        run: make dist/kopia_linux_armv7l/kopia
+          run: make dist/kopia_linux_armv7l/kopia
       - name: Store build artefacts (binary)
         uses: actions/upload-artifact@v3
         with:
