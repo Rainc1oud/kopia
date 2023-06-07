@@ -18,7 +18,7 @@ jobs:
       - name: Build arm32v7 binary with make
         uses: uraimo/run-on-arch-action@v2
         with:
-          arch: armv7
+          arch: arm32v7
           run: make dist/kopia_linux_armv7l/kopia
       - name: Store build artefacts (binary)
         uses: actions/upload-artifact@v3
