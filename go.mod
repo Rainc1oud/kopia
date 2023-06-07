@@ -57,7 +57,6 @@ require (
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	golang.org/x/mod v0.10.0
 	golang.org/x/net v0.10.0
-	golang.org/x/oauth2 v0.8.0
 	golang.org/x/sync v0.2.0
 	golang.org/x/sys v0.9.0
 	golang.org/x/term v0.9.0
@@ -65,17 +64,9 @@ require (
 	google.golang.org/api v0.127.0
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
-	gopkg.in/kothar/go-backblaze.v0 v0.0.0-20210124194846-35409b867216
 )
 
 require (
-	cloud.google.com/go v0.110.2 // indirect
-	cloud.google.com/go/compute v1.20.0 // indirect
-	cloud.google.com/go/compute/metadata v0.2.3 // indirect
-	cloud.google.com/go/iam v1.1.0 // indirect
-	github.com/Azure/azure-pipeline-go v0.2.3 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/internal v1.3.0 // indirect
-	github.com/Azure/go-autorest/autorest/adal v0.9.16 // indirect
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5 // indirect
 	github.com/alessio/shellescape v1.4.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -92,8 +83,6 @@ require (
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.1.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
-	github.com/golang/glog v1.1.1 // indirect
-	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/pprof v0.0.0-20230602150820-91b7bce49751 // indirect
 	github.com/google/readahead v0.0.0-20161222183148-eaceba169032 // indirect
 	github.com/google/s2a-go v0.1.4 // indirect
@@ -105,7 +94,6 @@ require (
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/kr/fs v0.1.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/mattn/go-ieproxy v0.0.1 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
@@ -113,18 +101,12 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/pquerna/ffjson v0.0.0-20190930134022-aa0246cd15f7 // indirect
 	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
-	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel/metric v1.16.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
-	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230530153820-e85fd2cbaebc // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20230530153820-e85fd2cbaebc // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
