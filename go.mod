@@ -4,7 +4,6 @@ go 1.20
 
 replace( 
 		github.com/kopia/kopia/ => ./
-		github.com/kopia/kopia/repo/blob/uplink => ./kopia/repo/blob/uplink
 	)
 
 require (

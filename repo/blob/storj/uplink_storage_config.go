@@ -1,4 +1,4 @@
-package uplink
+package storj
 
 import "github.com/kopia/kopia/repo/blob"
 
@@ -8,7 +8,7 @@ type PrefixAndStorageClass struct {
 	StorageClass string  `json:"storageClass"`
 }
 
-// StorageConfig contains storage configuration optionally persisted in the storage itself.
-type StorageConfig struct {
+// storjConfig contains storage configuration optionally persisted in the storage itself.
+type storjConfig struct {
 	BlobOptions []PrefixAndStorageClass `json:"blobOptions,omitempty"`
 }

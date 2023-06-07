@@ -1,4 +1,4 @@
-package uplink
+package storj
 
 import (
 	"context"
@@ -15,21 +15,21 @@ import (
 )
 
 const (
-	uplinkStorageType = "uplink"
+	StorjStorageType = "storj"
 )
 
-type uplinkPointInTimeStorage struct {
-	uplinkStorage
+type storjPointInTimeStorage struct {
+	StorjStorage
 
 	pointInTime time.Time
 }
 
-type uplinkStorage struct {
+type StorjStorage struct {
 	Options
 
 	cli *minio.Client
 
-	storageConfig *StorageConfig
+	storageConfig *storjConfig
 }
 
 func New(ctx context.Context, opt *Options, isCreate bool) (blob.Storage, error) {
@@ -46,7 +46,7 @@ func New(ctx context.Context, opt *Options, isCreate bool) (blob.Storage, error)
 	return retrying.NewWrapper(s), nil
 }
 
-func newStorage(ctx context.Context, opt *Options) (*uplinkStorage, error) {
+func newStorage(ctx context.Context, opt *Options) (*StorjStorage, error) {
 	creds := credentials.NewChainCredentials(
 		[]credentials.Provider{
 			&credentials.Static{
@@ -69,7 +69,7 @@ func newStorage(ctx context.Context, opt *Options) (*uplinkStorage, error) {
 	return newStorageWithCredentials(ctx, creds, opt)
 }
 
-func newStorageWithCredentials(ctx context.Context, creds *credentials.Credentials, opt *Options) (*uplinkStorage, error) {
+func newStorageWithCredentials(ctx context.Context, creds *credentials.Credentials, opt *Options) (*StorjStorage, error) {
 	if opt.BucketName == "" {
 		return nil, errors.New("bucket name must be specified")
 	}
@@ -81,7 +81,7 @@ func newStorageWithCredentials(ctx context.Context, creds *credentials.Credentia
 
 // maybePointInTimeStore wraps s with a point-in-time store when s is versioned
 // and a point-in-time value is specified. Otherwise s is returned.
-func maybePointInTimeStore(ctx context.Context, s *uplinkStorage, pointInTime *time.Time) (blob.Storage, error) {
+func maybePointInTimeStore(ctx context.Context, s *StorjStorage, pointInTime *time.Time) (blob.Storage, error) {
 	if pit := s.Options.PointInTime; pit == nil || pit.IsZero() {
 		return s, nil
 	}
@@ -96,58 +96,58 @@ func maybePointInTimeStore(ctx context.Context, s *uplinkStorage, pointInTime *t
 		return nil, errors.Errorf("cannot create point-in-time view for non-versioned bucket '%s'", s.BucketName)
 	}
 
-	return readonly.NewWrapper(&uplinkPointInTimeStorage{
-		uplinkStorage: *s,
-		pointInTime:   *pointInTime,
+	return readonly.NewWrapper(&storjPointInTimeStorage{
+		StorjStorage: *s,
+		pointInTime:  *pointInTime,
 	}), nil
 }
 
 //############################ blob interface implementation
 
-func (s *uplinkStorage) PutBlob(ctx context.Context, b blob.ID, data blob.Bytes, opts blob.PutOptions) error {
+func (s *StorjStorage) PutBlob(ctx context.Context, b blob.ID, data blob.Bytes, opts blob.PutOptions) error {
 
 	panic("someFunc not implemented")
 }
 
 // DeleteBlob removes the blob from storage. Future Get() operations will fail with ErrNotFound.
-func (s *uplinkStorage) DeleteBlob(ctx context.Context, b blob.ID) error {
+func (s *StorjStorage) DeleteBlob(ctx context.Context, b blob.ID) error {
 	panic("someFunc not implemented")
 }
 
 // Close releases all resources associated with storage.
-func (s *uplinkStorage) Close(ctx context.Context) error {
+func (s *StorjStorage) Close(ctx context.Context) error {
 	return nil
 }
 
 // FlushCaches flushes any local caches associated with storage.
-func (s *uplinkStorage) FlushCaches(ctx context.Context) error {
+func (s *StorjStorage) FlushCaches(ctx context.Context) error {
 	return nil
 }
 
-func (s *uplinkStorage) ConnectionInfo() blob.ConnectionInfo {
+func (s *StorjStorage) ConnectionInfo() blob.ConnectionInfo {
 	return blob.ConnectionInfo{
-		Type:   uplinkStorageType,
+		Type:   StorjStorageType,
 		Config: &s.Options,
 	}
 }
 
-func (s *uplinkStorage) DisplayName() string {
+func (s *StorjStorage) DisplayName() string {
 	return fmt.Sprintf("S3: %v %v", s.Endpoint, s.BucketName)
 }
 
-func (s *uplinkStorage) GetBlob(ctx context.Context, b blob.ID, offset, length int64, output blob.OutputBuffer) error {
+func (s *StorjStorage) GetBlob(ctx context.Context, b blob.ID, offset, length int64, output blob.OutputBuffer) error {
 	panic("someFunc not implemented")
 
 }
 
-func (s *uplinkStorage) GetCapacity(ctx context.Context) (blob.Capacity, error) {
+func (s *StorjStorage) GetCapacity(ctx context.Context) (blob.Capacity, error) {
 	return blob.Capacity{}, blob.ErrNotAVolume
 }
 
-func (s *uplinkStorage) GetMetadata(ctx context.Context, b blob.ID) (blob.Metadata, error) {
+func (s *StorjStorage) GetMetadata(ctx context.Context, b blob.ID) (blob.Metadata, error) {
 	panic("someFunc not implemented")
 }
 
-func (s *uplinkStorage) ListBlobs(ctx context.Context, prefix blob.ID, callback func(blob.Metadata) error) error {
+func (s *StorjStorage) ListBlobs(ctx context.Context, prefix blob.ID, callback func(blob.Metadata) error) error {
 	panic("someFunc not implemented")
 }
