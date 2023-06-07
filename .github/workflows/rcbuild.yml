@@ -14,8 +14,10 @@ jobs:
         GOARCH: arm
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build arm32v7 binary with make
+        with:
+          arch: armv7
         run: make dist/kopia_linux_armv7l/kopia
       - name: Store build artefacts (binary)
         uses: actions/upload-artifact@v3
