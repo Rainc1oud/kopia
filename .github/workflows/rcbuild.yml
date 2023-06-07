@@ -22,6 +22,7 @@ jobs:
             -v $(pwd):$(pwd) \
             -w $(pwd) \
             -e GOOS=linux -e GOARCH=arm \
+            -e CI=${CI} -e GITHUB_REF=${GITHUB_REF} -e GITHUB_REF_NAME=${GITHUB_REF_NAME} -e GITHUB_REF_TYPE=${GITHUB_REF_TYPE} \
             quay.io/ppenguin/xbuildimg/rcbuild-go:arm-glibc2.17-go1.20.1 \
             make dist/kopia_linux_armv7l/kopia
       # actually run-on-arch action is already a "container-selector"?
