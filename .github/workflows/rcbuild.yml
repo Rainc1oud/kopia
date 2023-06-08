@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - rcbuild
+      - remove-unneeded-backends  # test arm-qemu build duration reduction without (notably) needing appengine
 
 jobs:
   build:
