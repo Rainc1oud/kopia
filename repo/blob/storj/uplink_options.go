@@ -1,4 +1,4 @@
-package uplink
+package storj
 
 import (
 	"time"
