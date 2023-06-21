@@ -25,10 +25,10 @@ func TestMbBucket(t *testing.T) {
 	testName := "TestMbBucket"
 
 	options := Options{
-		BucketName:            "TestMbBucket",
+		BucketName:            "demo1",
 		Endpoint:              "",
 		Limits:                throttling.Limits{},
-		ex:                    nil, //Todo implement external interface (is not public)
+		ex:                    NewRcExternal(), //Todo implement external interface (is not public)
 		access:                "",
 		accessName:            "demo",
 		keyOrGrant:            testGrant,
