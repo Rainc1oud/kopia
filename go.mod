@@ -2,9 +2,7 @@ module github.com/kopia/kopia
 
 go 1.20
 
-replace( 
-		github.com/kopia/kopia/ => ./
-	)
+replace github.com/kopia/kopia/ => ./
 
 require (
 	cloud.google.com/go/storage v1.30.1
@@ -70,6 +68,7 @@ require (
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
 	gopkg.in/kothar/go-backblaze.v0 v0.0.0-20210124194846-35409b867216
+	storj.io/storj v1.81.3
 )
 
 require (
@@ -83,12 +82,14 @@ require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5 // indirect
 	github.com/alessio/shellescape v1.4.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/calebcase/tmpfile v1.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/danieljoos/wincred v1.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/felixge/fgprof v0.9.3 // indirect
+	github.com/flynn/noise v1.0.0 // indirect
 	github.com/frankban/quicktest v1.13.1 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -122,6 +123,9 @@ require (
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
+	github.com/zeebo/clingy v0.0.0-20230602044025-906be850f10d // indirect
+	github.com/zeebo/errs v1.3.0 // indirect
+	github.com/zeebo/errs/v2 v2.0.3 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel/metric v1.16.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
@@ -132,4 +136,8 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	storj.io/common v0.0.0-20230602145716-d6ea82d58b3d // indirect
+	storj.io/drpc v0.0.33 // indirect
+	storj.io/picobuf v0.0.1 // indirect
+	storj.io/uplink v1.10.1-0.20230607180240-72bcffbeac33 // indirect
 )
