@@ -3,15 +3,11 @@ package storj
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/kopia/kopia/repo/blob"
 	"github.com/kopia/kopia/repo/blob/readonly"
 	"github.com/kopia/kopia/repo/blob/retrying"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -26,8 +22,6 @@ type storjPointInTimeStorage struct {
 
 type StorjStorage struct {
 	Options
-
-	cli *minio.Client
 
 	storageConfig *storjConfig
 }
@@ -47,36 +41,33 @@ func New(ctx context.Context, opt *Options, isCreate bool) (blob.Storage, error)
 }
 
 func newStorage(ctx context.Context, opt *Options) (*StorjStorage, error) {
-	creds := credentials.NewChainCredentials(
-		[]credentials.Provider{
-			&credentials.Static{
-				Value: credentials.Value{
-					// AccessKeyID:     opt.AccessKeyID,
-					// SecretAccessKey: opt.SecretAccessKey,
-					// SessionToken:    opt.SessionToken,
-					SignerType: credentials.SignatureV4,
-				},
-			},
-			&credentials.EnvAWS{},
-			&credentials.IAM{
-				Client: &http.Client{
-					Transport: http.DefaultTransport,
-				},
-			},
-		},
-	)
 
-	return newStorageWithCredentials(ctx, creds, opt)
-}
+	opt.ex = NewRcExternal()
 
-func newStorageWithCredentials(ctx context.Context, creds *credentials.Credentials, opt *Options) (*StorjStorage, error) {
-	if opt.BucketName == "" {
-		return nil, errors.New("bucket name must be specified")
+	err := SetupAccess(ctx, *opt)
+	if err != nil {
+		return nil, err
 	}
-	//TODO validate bucket exists
-	// TODO f not existis opne bucket
 
-	return nil, nil
+	project, err := opt.ex.OpenProject(ctx, opt.access)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = project.Close() }()
+
+	_, err = project.CreateBucket(ctx, opt.BucketName)
+
+	if err != nil {
+		return nil, err
+	}
+
+	storjStorage := StorjStorage{
+		Options: *opt,
+
+		storageConfig: &storjConfig{},
+	}
+
+	return &storjStorage, nil
 }
 
 // maybePointInTimeStore wraps s with a point-in-time store when s is versioned
@@ -84,16 +75,6 @@ func newStorageWithCredentials(ctx context.Context, creds *credentials.Credentia
 func maybePointInTimeStore(ctx context.Context, s *StorjStorage, pointInTime *time.Time) (blob.Storage, error) {
 	if pit := s.Options.PointInTime; pit == nil || pit.IsZero() {
 		return s, nil
-	}
-
-	// Does the bucket supports versioning?
-	vi, err := s.cli.GetBucketVersioning(ctx, s.BucketName)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not get determine if bucket '%s' supports versioning", s.BucketName)
-	}
-
-	if !vi.Enabled() {
-		return nil, errors.Errorf("cannot create point-in-time view for non-versioned bucket '%s'", s.BucketName)
 	}
 
 	return readonly.NewWrapper(&storjPointInTimeStorage{

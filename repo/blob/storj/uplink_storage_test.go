@@ -25,7 +25,7 @@ func TestMbBucket(t *testing.T) {
 	testName := "TestMbBucket"
 
 	options := Options{
-		BucketName:            "demo1",
+		BucketName:            "demo3",
 		Endpoint:              "",
 		Limits:                throttling.Limits{},
 		ex:                    NewRcExternal(), //Todo implement external interface (is not public)
@@ -52,6 +52,11 @@ func TestMbBucket(t *testing.T) {
 
 	_, err = project.CreateBucket(ctx, options.BucketName)
 
+	if err != nil {
+		t.Errorf(testName)
+	}
+
+	_, err = project.DeleteBucket(ctx, options.BucketName)
 	if err != nil {
 		t.Errorf(testName)
 	}
