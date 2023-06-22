@@ -21,6 +21,29 @@ func TestStorjStorage(t *testing.T) {
 
 }
 
+func TestNew(t *testing.T) {
+	testName := "TestNew"
+	options := Options{
+		BucketName:            "new",
+		Endpoint:              "",
+		Limits:                throttling.Limits{},
+		ex:                    NewstorjExternal(), //Todo implement external interface (is not public)
+		access:                "",
+		accessName:            "demo",
+		keyOrGrant:            testGrant,
+		satelliteAddr:         "",
+		passphrase:            testPassPhrase,
+		unencryptedObjectKeys: false,
+		PointInTime:           &time.Time{},
+	}
+
+	ctx := context.Background()
+	_, err := New(ctx, &options, false)
+	if err != nil {
+		t.Errorf(testName)
+	}
+}
+
 func TestMbBucket(t *testing.T) {
 	testName := "TestMbBucket"
 
@@ -28,7 +51,7 @@ func TestMbBucket(t *testing.T) {
 		BucketName:            "demo3",
 		Endpoint:              "",
 		Limits:                throttling.Limits{},
-		ex:                    NewRcExternal(), //Todo implement external interface (is not public)
+		ex:                    NewstorjExternal(), //Todo implement external interface (is not public)
 		access:                "",
 		accessName:            "demo",
 		keyOrGrant:            testGrant,

@@ -8,12 +8,12 @@ import (
 	"github.com/zeebo/errs"
 )
 
-func (rc *rcExternal) loadAccesses() error {
-	if rc.access.accesses != nil {
+func (se *storjExternal) loadAccesses() error {
+	if se.access.accesses != nil {
 		return nil
 	}
 
-	fh, err := os.Open(rc.AccessInfoFile())
+	fh, err := os.Open(se.AccessInfoFile())
 	if os.IsNotExist(err) {
 		return nil
 	} else if err != nil {
@@ -34,14 +34,14 @@ func (rc *rcExternal) loadAccesses() error {
 	// so check here and resave if necessary.
 	defaultName, ok := checkAccessMapping(jsonInput.Default, jsonInput.Accesses)
 	if ok {
-		if err := rc.SaveAccessInfo(defaultName, jsonInput.Accesses); err != nil {
+		if err := se.SaveAccessInfo(defaultName, jsonInput.Accesses); err != nil {
 			return errs.Wrap(err)
 		}
 	}
 
-	rc.access.defaultName = jsonInput.Default
-	rc.access.accesses = jsonInput.Accesses
-	rc.access.loaded = true
+	se.access.defaultName = jsonInput.Default
+	se.access.accesses = jsonInput.Accesses
+	se.access.loaded = true
 
 	return nil
 }

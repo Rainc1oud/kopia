@@ -42,7 +42,7 @@ func New(ctx context.Context, opt *Options, isCreate bool) (blob.Storage, error)
 
 func newStorage(ctx context.Context, opt *Options) (*StorjStorage, error) {
 
-	opt.ex = NewRcExternal()
+	opt.ex = NewstorjExternal()
 
 	err := SetupAccess(ctx, *opt)
 	if err != nil {

@@ -22,7 +22,7 @@ const (
 	uplinkCLIUserAgent = "blob-storj"
 )
 
-type rcExternal struct {
+type storjExternal struct {
 	access struct {
 		loaded      bool              // true if we've successfully loaded access.json
 		defaultName string            // default access name to use from accesses
@@ -36,19 +36,19 @@ type rcExternal struct {
 	}
 }
 
-// NewRcExternal constructor for new rc external stuct
-func NewRcExternal() *rcExternal {
-	return &rcExternal{}
+// NewstorjExternal constructor for new rc external stuct
+func NewstorjExternal() *storjExternal {
+	return &storjExternal{}
 }
 
-func (rc *rcExternal) OpenFilesystem(ctx context.Context, accessName string, options ...ulext.Option) (ulfs.Filesystem, error) {
+func (se *storjExternal) OpenFilesystem(ctx context.Context, accessName string, options ...ulext.Option) (ulfs.Filesystem, error) {
 	panic("func not implemented")
 }
 
-func (rc *rcExternal) OpenProject(ctx context.Context, accessName string, options ...ulext.Option) (*uplink.Project, error) {
+func (se *storjExternal) OpenProject(ctx context.Context, accessName string, options ...ulext.Option) (*uplink.Project, error) {
 	opts := ulext.LoadOptions(options...)
 
-	access, err := rc.OpenAccess(accessName)
+	access, err := se.OpenAccess(accessName)
 	if err != nil {
 		return nil, err
 	}
@@ -76,16 +76,16 @@ func (rc *rcExternal) OpenProject(ctx context.Context, accessName string, option
 	return config.OpenProject(ctx, access)
 }
 
-func (rc *rcExternal) AccessInfoFile() string {
-	return filepath.Join(rc.dirs.current, "access.json")
+func (se *storjExternal) AccessInfoFile() string {
+	return filepath.Join(se.dirs.current, "access.json")
 }
 
-func (rc *rcExternal) OpenAccess(accessName string) (access *uplink.Access, err error) {
+func (se *storjExternal) OpenAccess(accessName string) (access *uplink.Access, err error) {
 	if access, err := parseAccessDataOrPossiblyFile(accessName); err == nil {
 		return access, nil
 	}
 
-	defaultName, accesses, err := rc.GetAccessInfo(true)
+	defaultName, accesses, err := se.GetAccessInfo(true)
 	if err != nil {
 		return nil, err
 	}
@@ -122,27 +122,27 @@ func parseAccessDataOrPossiblyFile(accessDataOrFile string) (*uplink.Access, err
 	return uplink.ParseAccess(string(bytes.TrimSpace(accessData)))
 }
 
-func (rc *rcExternal) GetAccessInfo(required bool) (string, map[string]string, error) {
-	if !rc.access.loaded {
-		if err := rc.loadAccesses(); err != nil {
+func (se *storjExternal) GetAccessInfo(required bool) (string, map[string]string, error) {
+	if !se.access.loaded {
+		if err := se.loadAccesses(); err != nil {
 			return "", nil, err
 		}
-		if required && !rc.access.loaded {
+		if required && !se.access.loaded {
 			return "", nil, errs.New("No accesses configured. Use 'access import' or 'access create' to create one")
 		}
 	}
 
 	// return a copy to avoid mutations messing things up
 	accesses := make(map[string]string)
-	for name, accessData := range rc.access.accesses {
+	for name, accessData := range se.access.accesses {
 		accesses[name] = accessData
 	}
 
-	return rc.access.defaultName, accesses, nil
+	return se.access.defaultName, accesses, nil
 }
 
-func (rc *rcExternal) SaveAccessInfo(defaultName string, accesses map[string]string) error {
-	accessFh, err := os.OpenFile(rc.AccessInfoFile(), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+func (se *storjExternal) SaveAccessInfo(defaultName string, accesses map[string]string) error {
+	accessFh, err := os.OpenFile(se.AccessInfoFile(), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return errs.Wrap(err)
 	}
@@ -176,26 +176,26 @@ func (rc *rcExternal) SaveAccessInfo(defaultName string, accesses map[string]str
 	return nil
 }
 
-func (rc *rcExternal) RequestAccess(ctx context.Context, satelliteAddress, apiKey, passphrase string, unencryptedObjectKeys bool) (*uplink.Access, error) {
+func (se *storjExternal) RequestAccess(ctx context.Context, satelliteAddress, apiKey, passphrase string, unencryptedObjectKeys bool) (*uplink.Access, error) {
 	panic("func not implemented")
 }
 
-func (rc *rcExternal) ExportAccess(ctx context.Context, access *uplink.Access, filename string) error {
+func (se *storjExternal) ExportAccess(ctx context.Context, access *uplink.Access, filename string) error {
 	panic("func not implemented")
 }
 
-func (rc *rcExternal) ConfigFile() string {
+func (se *storjExternal) ConfigFile() string {
 	panic("func not implemented")
 }
 
-func (rc *rcExternal) SaveConfig(values map[string]string) error {
+func (se *storjExternal) SaveConfig(values map[string]string) error {
 	panic("func not implemented")
 }
 
-func (rc *rcExternal) PromptInput(ctx context.Context, prompt string) (input string, err error) {
+func (se *storjExternal) PromptInput(ctx context.Context, prompt string) (input string, err error) {
 	panic("func not implemented")
 }
 
-func (rc *rcExternal) PromptSecret(ctx context.Context, prompt string) (secret string, err error) {
+func (se *storjExternal) PromptSecret(ctx context.Context, prompt string) (secret string, err error) {
 	panic("func not implemented")
 }
