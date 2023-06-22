@@ -58,7 +58,8 @@ func newStorage(ctx context.Context, opt *Options) (*StorjStorage, error) {
 	_, err = project.CreateBucket(ctx, opt.BucketName)
 
 	if err != nil {
-		return nil, err
+		fmt.Printf("bucket %q allready exists \n", opt.BucketName)
+		// todo log bucket allready exists, issue from satellite
 	}
 
 	storjStorage := StorjStorage{
@@ -130,5 +131,31 @@ func (s *StorjStorage) GetMetadata(ctx context.Context, b blob.ID) (blob.Metadat
 }
 
 func (s *StorjStorage) ListBlobs(ctx context.Context, prefix blob.ID, callback func(blob.Metadata) error) error {
-	panic("someFunc not implemented")
+	ctx, cancel := context.WithCancel(ctx)
+
+	defer cancel()
+
+	project, err := s.ex.OpenProject(ctx, s.Options.access)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = project.Close() }()
+
+	iter := project.ListBuckets(ctx, nil)
+
+	for iter.Next() {
+		item := iter.Item()
+
+		bm := blob.Metadata{
+			BlobID: blob.ID(item.Name),
+			//Length:    ,   //TBD
+			Timestamp: item.Created,
+		}
+
+		if err := callback(bm); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

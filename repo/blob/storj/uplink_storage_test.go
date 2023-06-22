@@ -2,9 +2,11 @@ package storj
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
+	"github.com/kopia/kopia/repo/blob"
 	"github.com/kopia/kopia/repo/blob/throttling"
 )
 
@@ -14,6 +16,21 @@ var (
 	testDemoApiKEy       = "1dfJZPALYQjkVjo5Yq14jpakQxZ549HfUrUePNRVxSznDGnyihpWwGvuC3o5TjXE9LSn3ePzj2eoND3Ugt1Wm4WYGb5tcsrj94qRmnyR6odGLhUkgTFd"
 	testGrant            = "1T4nEUpLyBqrJSmJZA3zNV5ykbzrN3Phes99bYKL8kieRNzhkkvormrUKyEepDbeJiC1zG1Bnkdr1Li67h1untcmn5V822jCshYMLKsvwwyUxDGSvZmuwREotJC1kZpUqPaCcgh3FhxCqY2nf6vQDh4VMGP9oyef8aQ1UQmZxqL1EwTwWi7i6erYLVSs3NTXyzUuJq4gw2F1pwFv7qrUX4K1iWKaFysJi7GzQNVSuPgLmBqsdpEnuJ9HKysinLac7NNtGEjSqXZb42w9qghqBNk"
 	testPassPhrase       = "demoMypass"
+	testAccessName       = "demo-storj"
+	testBucketName       = "demo-storj"
+	optionsTest1         = Options{
+		BucketName:            testBucketName,
+		Endpoint:              "",
+		Limits:                throttling.Limits{},
+		ex:                    NewstorjExternal(), //Todo implement external interface (is not public)
+		access:                "",
+		accessName:            testAccessName,
+		keyOrGrant:            testGrant,
+		satelliteAddr:         "",
+		passphrase:            testPassPhrase,
+		unencryptedObjectKeys: false,
+		PointInTime:           &time.Time{},
+	}
 )
 
 func TestStorjStorage(t *testing.T) {
@@ -21,29 +38,42 @@ func TestStorjStorage(t *testing.T) {
 
 }
 
+// interface
 func TestNew(t *testing.T) {
 	testName := "TestNew"
-	options := Options{
-		BucketName:            "new",
-		Endpoint:              "",
-		Limits:                throttling.Limits{},
-		ex:                    NewstorjExternal(), //Todo implement external interface (is not public)
-		access:                "",
-		accessName:            "demo",
-		keyOrGrant:            testGrant,
-		satelliteAddr:         "",
-		passphrase:            testPassPhrase,
-		unencryptedObjectKeys: false,
-		PointInTime:           &time.Time{},
-	}
 
 	ctx := context.Background()
-	_, err := New(ctx, &options, false)
+	_, err := New(ctx, &optionsTest1, false)
 	if err != nil {
 		t.Errorf(testName)
 	}
 }
 
+func TestListBlobs(t *testing.T) {
+	testName := "TestListBlobs"
+
+	ctx := context.Background()
+
+	storjStorage, err := New(ctx, &optionsTest1, false)
+	if err != nil {
+		t.Errorf(testName)
+	}
+
+	storjStorage.ListBlobs(ctx, blob.ID(testAccessName), func(b blob.Metadata) error {
+		if b.BlobID == blob.ID(testBucketName) {
+			fmt.Printf("found requested bucket %q  \n", b.BlobID)
+		} else {
+			fmt.Printf("bucket %q found \n", b.BlobID)
+		}
+
+		return nil
+	})
+
+}
+
+// func(b blob.Metadata)
+
+// function tests
 func TestMbBucket(t *testing.T) {
 	testName := "TestMbBucket"
 
