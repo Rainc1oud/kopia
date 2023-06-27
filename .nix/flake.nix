@@ -1,8 +1,8 @@
 {
-  description = "go and nodejs shell";
+  description = "go dev env (kopia)";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs";
     # nixpkgs.url = "github:NixOS/nixpkgs/da2ae6e41e5787f50b75ff2cf521057ab44d504e";
     flake-utils.url = "github:numtide/flake-utils";
   };
