@@ -1,0 +1,155 @@
+default:
+  tags:
+  - docker
+  image: 1nnoserv:15000/xbuildimg/rcbuild-go:amd64-glibc2.31-go1.20.1
+
+stages:
+  - semvertag
+  - build
+  # - test
+  # - upload
+  # - deploy
+
+# include semantic versioning autotagging CI
+# Remember to a project CI var BOT_ACCESS_TOKEN containing it
+# and actually there appears to be a bug, trying with temp hack:
+# ref: https://gitlab.com/gitlab-org/gitlab/-/issues/259665#note_451973854
+# temp hack doesn't work, but now a permanent CI bot (r-ci-bot) has been defined,
+# for whom the correct personal access token should be used
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  FROM_PIPELINE: kopia
+  GOPROXY: "http://ryzerv:3000,direct"
+  GONOSUMDB: "g1tlab.1nnov8.de/*,rain.cloud/*"  # !!! *always* set this when using the proxy !!!
+
+include:
+  - project: 'r/deploy/iss'
+    file: 'default_workflow.gitlab-ci.yml'
+  - project: 'r/deploy/iss'
+    file: 'semvertag.gitlab-ci.yml'
+
+build-amd64:
+  variables:
+    GOARCH: "amd64"
+    VGLIBC: "2.31"
+    GOMODCACHE: "${CI_PROJECT_DIR}/.gomodcache-${GOARCH}/pkg/mod"
+    GOCACHE: "${CI_PROJECT_DIR}/.gocache-${GOARCH}/go-build"
+    GOPATH: "${CI_PROJECT_DIR}/.go-${GOARCH}"
+    CGO_ENABLED: "0"
+  stage: build
+  tags:
+    - docker
+  image: 1nnoserv:15000/xbuildimg/rcbuild-go:${GOARCH}-glibc${VGLIBC}-go1.20.1
+  artifacts:
+    paths:
+      - dist/kopia_linux_x64/
+  cache:
+    key: gocache-${GOARCH}
+    paths:
+      - .gomodcache-${GOARCH}/pkg/mod # here we *need* a relative path (all else didn't work, and it makes more sense too)
+      - .gocache-${GOARCH}/go-build
+      - .go-${GOARCH} # we add gopath since these are also native binaries worth caching for speed improvements
+  script: |
+    . /etc/profile # still verrrrry important due to strange entrypoint/env issue
+    make dist/kopia_linux_x64/kopia
+
+build-arm64:
+  variables:
+    GOARCH: "arm64"
+    VGLIBC: "2.19"
+    GOMODCACHE: "${CI_PROJECT_DIR}/.gomodcache-${GOARCH}/pkg/mod"
+    GOCACHE: "${CI_PROJECT_DIR}/.gocache-${GOARCH}/go-build"
+    GOPATH: "${CI_PROJECT_DIR}/.go-${GOARCH}"
+    CGO_ENABLED: "0"
+  stage: build
+  tags:
+    - docker
+  image: 1nnoserv:15000/xbuildimg/rcbuild-go:${GOARCH}-glibc${VGLIBC}-go1.20.1
+  artifacts:
+    paths:
+      - dist/kopia_linux_arm64/
+  cache:
+    key: gocache-${GOARCH}
+    paths:
+      - .gomodcache-${GOARCH}/pkg/mod # here we *need* a relative path (all else didn't work, and it makes more sense too)
+      - .gocache-${GOARCH}/go-build
+      - .go-${GOARCH} # we add gopath since these are also native binaries worth caching for speed improvements
+  script: |
+    . /etc/profile # still verrrrry important due to strange entrypoint/env issue
+    make dist/kopia_linux_arm64/kopia
+
+build-arm217:
+  variables:
+    GOARCH: "arm"
+    VGLIBC: "2.17"
+    GOMODCACHE: "${CI_PROJECT_DIR}/.gomodcache-${GOARCH}-glibc${VGLIBC}/pkg/mod"
+    GOCACHE: "${CI_PROJECT_DIR}/.gocache-${GOARCH}-glibc${VGLIBC}/go-build"
+    GOPATH: "${CI_PROJECT_DIR}/.go-${GOARCH}-glibc${VGLIBC}"
+    CC: "/usr/local/bin/gcc"
+  stage: build
+  tags:
+    - docker
+  image: 1nnoserv:15000/xbuildimg/rcbuild-go:${GOARCH}-glibc${VGLIBC}-go1.20.1
+  artifacts:
+    paths:
+      - dist/kopia_linux_armv7l/
+  cache:
+    key: gocache-${GOARCH}-glibc${VGLIBC}
+    paths:
+      - .gomodcache-${GOARCH}-glibc${VGLIBC}/pkg/mod # here we *need* a relative path (all else didn't work, and it makes more sense too)
+      - .gocache-${GOARCH}-glibc${VGLIBC}/go-build
+      - .go-${GOARCH}-glibc${VGLIBC} # we add gopath since these are also native binaries worth caching for speed improvements
+  script:
+    - |
+      source /etc/environment
+      make dist/kopia_linux_armv7l/kopia
+  only:
+    - /^main$|^alpha$/
+
+test-job1:
+  variables:
+    GOARCH: "amd64"
+    VGLIBC: "2.31"
+    GOMODCACHE: "${CI_PROJECT_DIR}/.gomodcache-${GOARCH}/pkg/mod"
+    GOCACHE: "${CI_PROJECT_DIR}/.gocache-${GOARCH}/go-build"
+    GOPATH: "${CI_PROJECT_DIR}/.go-${GOARCH}"
+  stage: test
+  tags:
+    - docker
+  image: 1nnoserv:15000/xbuildimg/rcbuild-go:${GOARCH}-glibc${VGLIBC}-go1.20.1
+  dependencies:
+    - build-amd64
+  script: |
+    . /etc/profile
+    make ci-tests
+  # only:
+  #   - never
+
+upload-amd64:
+  variables:
+    GOARCH: "amd64"
+    VGLIBC: "2.31"
+  stage: upload
+  tags:
+    - docker
+  image: 1nnoserv:15000/xbuildimg/rcbuild-go:${GOARCH}-glibc${VGLIBC}-go1.20.1
+  dependencies:
+    - build-amd64
+  script: make upload
+  only:
+    - /^main$|^alpha$/
+
+upload-arm64:
+  variables:
+    GOARCH: "arm64"
+    VGLIBC: "2.19"
+  stage: upload
+  tags:
+    - docker
+  image: 1nnoserv:15000/xbuildimg/rcbuild-go:${GOARCH}-glibc${VGLIBC}-go1.20.1
+  dependencies:
+    - build-arm64
+  script: make upload
+  only:
+    - /^main$|^alpha$/
