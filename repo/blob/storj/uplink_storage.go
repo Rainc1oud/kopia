@@ -8,10 +8,14 @@ import (
 	"github.com/kopia/kopia/repo/blob"
 	"github.com/kopia/kopia/repo/blob/readonly"
 	"github.com/kopia/kopia/repo/blob/retrying"
+	"storj.io/storj/cmd/uplink/ulext"
+	"storj.io/storj/cmd/uplink/ulfs"
+	"storj.io/storj/cmd/uplink/ulloc"
 )
 
 const (
 	StorjStorageType = "storj"
+	StorjPath        = "sj://"
 )
 
 type storjPointInTimeStorage struct {
@@ -22,7 +26,7 @@ type storjPointInTimeStorage struct {
 
 type StorjStorage struct {
 	Options
-
+	encrypted     bool
 	storageConfig *storjConfig
 }
 
@@ -120,6 +124,17 @@ func (s *StorjStorage) DisplayName() string {
 func (s *StorjStorage) GetBlob(ctx context.Context, b blob.ID, offset, length int64, output blob.OutputBuffer) error {
 	panic("someFunc not implemented")
 
+	ctx, cancel := context.WithCancel(ctx)
+
+	defer cancel()
+
+	project, err := s.ex.OpenProject(ctx, s.Options.access)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = project.Close() }()
+	return nil
+
 }
 
 func (s *StorjStorage) GetCapacity(ctx context.Context) (blob.Capacity, error) {
@@ -146,14 +161,43 @@ func (s *StorjStorage) ListBlobs(ctx context.Context, prefix blob.ID, callback f
 	for iter.Next() {
 		item := iter.Item()
 
-		bm := blob.Metadata{
-			BlobID: blob.ID(item.Name),
-			//Length:    ,   //TBD
-			Timestamp: item.Created,
-		}
+		if blob.ID(item.Name) == prefix {
 
-		if err := callback(bm); err != nil {
-			return err
+			fs, err := s.ex.OpenFilesystem(ctx, s.access, ulext.BypassEncryption(s.encrypted))
+			if err != nil {
+				return err
+			}
+			defer func() { _ = fs.Close() }()
+
+			prefixUloc := ulloc.NewLocal(item.Name)
+
+			if fs.IsLocalDir(ctx, prefixUloc) {
+				prefixUloc = prefixUloc.AsDirectoryish()
+			}
+
+			// create the object iterator of either existing objects or pending multipart uploads
+			iter, err := fs.List(ctx, prefixUloc, &ulfs.ListOptions{
+				Recursive: s.Options.recursive,
+				Pending:   s.pending,
+				Expanded:  s.expanded,
+			})
+			if err != nil {
+				return err
+			}
+			for iter.Next() {
+				obj := iter.Item()
+
+				bm := blob.Metadata{
+					BlobID:    blob.ID(obj.Loc.Loc()),
+					Length:    obj.ContentLength,
+					Timestamp: item.Created,
+				}
+
+				if err := callback(bm); err != nil {
+					return err
+				}
+
+			}
 		}
 	}
 

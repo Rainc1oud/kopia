@@ -42,7 +42,11 @@ func NewstorjExternal() *storjExternal {
 }
 
 func (se *storjExternal) OpenFilesystem(ctx context.Context, accessName string, options ...ulext.Option) (ulfs.Filesystem, error) {
-	panic("func not implemented")
+	project, err := se.OpenProject(ctx, accessName, options...)
+	if err != nil {
+		return nil, err
+	}
+	return ulfs.NewMixed(ulfs.NewLocal(ulfs.NewLocalBackendOS()), ulfs.NewRemote(project)), nil
 }
 
 func (se *storjExternal) OpenProject(ctx context.Context, accessName string, options ...ulext.Option) (*uplink.Project, error) {

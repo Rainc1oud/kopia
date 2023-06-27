@@ -71,6 +71,29 @@ func TestListBlobs(t *testing.T) {
 
 }
 
+// func TestListBlob(t *testing.T) {
+// 	testName := "TestListBlob"
+
+// 	ctx := context.Background()
+// 	storjStorage, err := New(ctx, &optionsTest1, false)
+// 	if err != nil {
+// 		t.Errorf(testName)
+// 	}
+
+// 	//set storj path
+// 	path := filepath.Join(StorjPath, testAccessName)
+// 	storjStorage.ListBlobs(ctx, blob.ID(path), func(b blob.Metadata) error {
+// 		if b.BlobID == blob.ID(testBucketName) {
+// 			fmt.Printf("found requested bucket %q  \n", b.BlobID)
+// 		} else {
+// 			fmt.Printf("bucket %q found \n", b.BlobID)
+// 		}
+
+// 		return nil
+// 	})
+
+// }
+
 // func(b blob.Metadata)
 
 // function tests

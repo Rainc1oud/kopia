@@ -27,6 +27,10 @@ type Options struct {
 	passphrase            string
 	unencryptedObjectKeys bool
 
+	recursive bool
+	pending   bool
+	expanded  bool
+
 	// PointInTime specifies a view of the (versioned) store at that time
 	PointInTime *time.Time `json:"pointInTime,omitempty"`
 }
