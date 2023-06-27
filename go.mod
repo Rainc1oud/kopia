@@ -9,6 +9,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.6.1
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.0.0
 	github.com/Azure/azure-storage-blob-go v0.15.0
+	github.com/VividCortex/ewma v1.2.0
 	github.com/alecthomas/kingpin/v2 v2.3.2
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137
 	github.com/aws/aws-sdk-go v1.44.256
@@ -68,7 +69,9 @@ require (
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
 	gopkg.in/kothar/go-backblaze.v0 v0.0.0-20210124194846-35409b867216
+	storj.io/common v0.0.0-20230602145716-d6ea82d58b3d
 	storj.io/storj v1.81.3
+	storj.io/uplink v1.10.1-0.20230607180240-72bcffbeac33
 )
 
 require (
@@ -123,8 +126,6 @@ require (
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
-	github.com/zeebo/clingy v0.0.0-20230602044025-906be850f10d // indirect
-	github.com/zeebo/errs v1.3.0 // indirect
 	github.com/zeebo/errs/v2 v2.0.3 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel/metric v1.16.0 // indirect
@@ -136,8 +137,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	storj.io/common v0.0.0-20230602145716-d6ea82d58b3d // indirect
 	storj.io/drpc v0.0.33 // indirect
 	storj.io/picobuf v0.0.1 // indirect
-	storj.io/uplink v1.10.1-0.20230607180240-72bcffbeac33 // indirect
 )

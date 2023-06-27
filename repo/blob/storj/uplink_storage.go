@@ -3,11 +3,16 @@ package storj
 import (
 	"context"
 	"fmt"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/kopia/kopia/repo/blob"
 	"github.com/kopia/kopia/repo/blob/readonly"
 	"github.com/kopia/kopia/repo/blob/retrying"
+	"github.com/zeebo/errs"
+	"storj.io/common/fpath"
+	"storj.io/common/rpc/rpcpool"
 	"storj.io/storj/cmd/uplink/ulext"
 	"storj.io/storj/cmd/uplink/ulfs"
 	"storj.io/storj/cmd/uplink/ulloc"
@@ -92,7 +97,36 @@ func maybePointInTimeStore(ctx context.Context, s *StorjStorage, pointInTime *ti
 
 func (s *StorjStorage) PutBlob(ctx context.Context, b blob.ID, data blob.Bytes, opts blob.PutOptions) error {
 
-	panic("someFunc not implemented")
+	fs, err := s.ex.OpenFilesystem(ctx, s.access,
+		ulext.ConcurrentSegmentUploadsConfig(s.uploadConfig),
+		ulext.ConnectionPoolOptions(rpcpool.Options{
+			// Add a bit more capacity for connections to the satellite
+			Capacity:       s.uploadConfig.SchedulerOptions.MaximumConcurrent + 5,
+			KeyCapacity:    5,
+			IdleExpiration: 2 * time.Minute,
+		}))
+	if err != nil {
+		return err
+	}
+
+	defer func() { _ = fs.Close() }()
+
+	if s.inmemoryEC {
+		ctx = fpath.WithTempData(ctx, "", true)
+	}
+
+	path, err := filepath.Abs(string(b))
+	if err != nil {
+		return err
+	}
+	// set locs
+	s.locs = []ulloc.Location{ulloc.NewLocal(path), ulloc.NewLocal(path)}
+	//TODO fix locations
+	var eg errs.Group
+	for _, source := range s.locs[:len(s.locs)-1] {
+		eg.Add(s.dispatchCopy(ctx, fs, source, s.locs[len(s.locs)-1]))
+	}
+	return combineErrs(eg)
 }
 
 // DeleteBlob removes the blob from storage. Future Get() operations will fail with ErrNotFound.
@@ -123,18 +157,6 @@ func (s *StorjStorage) DisplayName() string {
 
 func (s *StorjStorage) GetBlob(ctx context.Context, b blob.ID, offset, length int64, output blob.OutputBuffer) error {
 	panic("someFunc not implemented")
-
-	ctx, cancel := context.WithCancel(ctx)
-
-	defer cancel()
-
-	project, err := s.ex.OpenProject(ctx, s.Options.access)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = project.Close() }()
-	return nil
-
 }
 
 func (s *StorjStorage) GetCapacity(ctx context.Context) (blob.Capacity, error) {
@@ -202,4 +224,17 @@ func (s *StorjStorage) ListBlobs(ctx context.Context, prefix blob.ID, callback f
 	}
 
 	return nil
+}
+
+func combineErrs(group errs.Group) error {
+	if len(group) == 0 {
+		return nil
+	}
+
+	errstrings := make([]string, len(group))
+	for i, err := range group {
+		errstrings[i] = err.Error()
+	}
+
+	return fmt.Errorf("%s", strings.Join(errstrings, "\n"))
 }

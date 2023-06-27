@@ -6,8 +6,11 @@ import (
 
 	"github.com/kopia/kopia/repo/blob/throttling"
 	"github.com/zeebo/errs"
+	"storj.io/common/memory"
 	"storj.io/storj/cmd/uplink/ulext"
+	"storj.io/storj/cmd/uplink/ulloc"
 	"storj.io/uplink"
+	"storj.io/uplink/private/testuplink"
 )
 
 // Options defines options for S3-based storage.
@@ -27,10 +30,22 @@ type Options struct {
 	passphrase            string
 	unencryptedObjectKeys bool
 
-	recursive bool
-	pending   bool
-	expanded  bool
+	// upload options
+	recursive            bool
+	pending              bool
+	expanded             bool
+	inmemoryEC           bool
+	locs                 []ulloc.Location
+	byteRange            string
+	progress             bool
+	transfers            int
+	dryrun               bool
+	expires              time.Time
+	metadata             map[string]string
+	parallelism          int
+	parallelismChunkSize memory.Size
 
+	uploadConfig testuplink.ConcurrentSegmentUploadsConfig
 	// PointInTime specifies a view of the (versioned) store at that time
 	PointInTime *time.Time `json:"pointInTime,omitempty"`
 }
